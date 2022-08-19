@@ -9,6 +9,8 @@ REDIS_HOST = os.getenv('redis_host')
 REDIS_PORT = os.getenv('redis_port')
 REDIS_PASSWORD = os.getenv('redis_password')
 CLASSIFY_IMAGE_URL = os.getenv('classify_image_url')
+DO_TTS_URL = os.getenv('do_tts_url')
+
 
 celery = Celery(
     'AI API Queue tasks',
@@ -21,5 +23,13 @@ celery = Celery(
 def classify_image(payload):
 
     response = requests.post(CLASSIFY_IMAGE_URL, json=payload)
+
+    return response.json()
+
+
+@celery.task(name="Do TTS")
+def do_tts(payload):
+
+    response = requests.post(DO_TTS_URL, json=payload)
 
     return response.json()

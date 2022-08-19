@@ -8,7 +8,16 @@ class Language(str, Enum):
     en = "en"
 
 
-class Item(BaseModel):
+class ImageParams(BaseModel):
     url: str
     lang: Union[Language, None] = Language.en
+    token: str
+
+
+class TTSParams(BaseModel):
+    voice: str
+    text: str
+    quality: str
+    candidate: Union[int, None] = 1
+    api_mode: Union[bool, None] = True
     token: str
