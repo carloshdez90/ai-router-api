@@ -72,3 +72,9 @@ def get_status(task_id):
         "task_result": task_result.result
     }
     return result
+
+# todo
+# add password to flower
+# deploy on a server
+# setup dns and ip
+# test using private ip only
