@@ -13,7 +13,7 @@ WorkingDirectory=/home/deploy/ai-router-api
 ExecStartPre=/usr/bin/docker compose -f docker-compose.yaml down
 
 # Start container when unit is started
-ExecStart=/usr/bin/docker compose -f docker-compose.yaml up
+ExecStart=/usr/bin/docker compose -f docker-compose.yaml up --build 
 
 # Stop container when unit is stopped
 ExecStop=/usr/bin/docker compose -f docker-compose.yaml down

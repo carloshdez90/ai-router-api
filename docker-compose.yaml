@@ -19,7 +19,7 @@ services:
   dashboard:
     build: ./app
     ports:
-      - 5555:5555
+      - 5556:5555
     command: celery -A worker.celery flower -l info --basic_auth=admin:3gBNVQ6ke7Gp
     depends_on:
       - ai-router
