@@ -21,3 +21,9 @@ class TTSParams(BaseModel):
     candidate: Union[int, None] = 1
     api_mode: Union[bool, None] = True
     token: str
+
+
+class SimilarityParams(BaseModel):
+    expected_response: str
+    student_response: str
+    token: str

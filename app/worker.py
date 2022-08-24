@@ -10,6 +10,7 @@ REDIS_PORT = os.getenv('redis_port')
 REDIS_PASSWORD = os.getenv('redis_password')
 CLASSIFY_IMAGE_URL = os.getenv('classify_image_url')
 DO_TTS_URL = os.getenv('do_tts_url')
+TEXT_SIMILARITY_URL = os.getenv('text_similarity_url')
 
 
 celery = Celery(
@@ -31,5 +32,13 @@ def classify_image(payload):
 def do_tts(payload):
 
     response = requests.post(DO_TTS_URL, json=payload)
+
+    return response.json()
+
+
+@celery.task(name="Text Similarity")
+def text_similarity(payload):
+
+    response = requests.post(TEXT_SIMILARITY_URL, json=payload)
 
     return response.json()

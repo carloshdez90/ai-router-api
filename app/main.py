@@ -1,8 +1,8 @@
 import os
 from fastapi import FastAPI, Request, HTTPException
 from utils import validate_token
-from worker import classify_image, celery, do_tts
-from models import ImageParams, TTSParams
+from worker import celery, classify_image, do_tts, text_similarity
+from models import ImageParams, TTSParams, SimilarityParams
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -17,21 +17,27 @@ def initialize():
     return app, env_vars
 
 
-app, env_vars = initialize()
-
-
-@app.post('/api/classify-image', status_code=201)
-def process_image(request: Request, item: ImageParams):
-
+def check_token(token):
     # validate if the provided token is valid
     try:
-        response = validate_token(item.token, env_vars)
+        response = validate_token(token, env_vars)
     except:
         raise HTTPException(status_code=400, detail="Invalid provided token")
 
     if response.status_code != 200 or dict(response.json())['active'] == False:
         raise HTTPException(
             status_code=400, detail="Invalid provided token")
+
+    return
+
+
+app, env_vars = initialize()
+
+
+@app.post('/api/classify-image', status_code=201)
+def process_image(request: Request, item: ImageParams):
+
+    check_token(item.token)
     payload = {
         "url": item.url,
         "lang": item.lang.value,
@@ -43,15 +49,7 @@ def process_image(request: Request, item: ImageParams):
 @app.post('/api/do-tts', status_code=201)
 def request_tts(request: Request, item: TTSParams):
 
-    # validate if the provided token is valid
-    try:
-        response = validate_token(item.token, env_vars)
-    except:
-        raise HTTPException(status_code=400, detail="Invalid provided token")
-
-    if response.status_code != 200 or dict(response.json())['active'] == False:
-        raise HTTPException(
-            status_code=400, detail="Invalid provided token")
+    check_token(item.token)
     payload = {
         "voice": item.voice,
         "text": item.text,
@@ -60,6 +58,18 @@ def request_tts(request: Request, item: TTSParams):
         "api_mode": True
     }
     task = do_tts.delay(payload)
+    return {"task_id": task.id}
+
+
+@app.post('/api/text-similarity', status_code=201)
+def check_text_similarity(request: Request, item: SimilarityParams):
+
+    check_token(item.token)
+    payload = {
+        "expected_response": item.expected_response,
+        "student_response": item.student_response,
+    }
+    task = text_similarity.delay(payload)
     return {"task_id": task.id}
 
 
@@ -72,8 +82,3 @@ def get_status(task_id):
         "task_result": task_result.result
     }
     return result
-
-# todo
-# deploy on a server
-# setup dns and ip
-# test using private ip only
