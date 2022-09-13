@@ -11,6 +11,7 @@ REDIS_PASSWORD = os.getenv('redis_password')
 CLASSIFY_IMAGE_URL = os.getenv('classify_image_url')
 DO_TTS_URL = os.getenv('do_tts_url')
 TEXT_SIMILARITY_URL = os.getenv('text_similarity_url')
+COLORING_SIMILARITY_URL = os.getenv('coloring_similarity_url')
 
 
 celery = Celery(
@@ -40,5 +41,13 @@ def do_tts(payload):
 def text_similarity(payload):
 
     response = requests.post(TEXT_SIMILARITY_URL, json=payload)
+
+    return response.json()
+
+
+@celery.task(name="Coloring Similarity")
+def coloring_similarity(payload):
+
+    response = requests.post(COLORING_SIMILARITY_URL, json=payload)
 
     return response.json()

@@ -1,8 +1,8 @@
 import os
 from fastapi import FastAPI, Request, HTTPException
 from utils import validate_token
-from worker import celery, classify_image, do_tts, text_similarity
-from models import ImageParams, TTSParams, SimilarityParams
+from worker import celery, classify_image, do_tts, text_similarity, coloring_similarity
+from models import ImageParams, TTSParams, SimilarityParams, ColoringParams
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -70,6 +70,19 @@ def check_text_similarity(request: Request, item: SimilarityParams):
         "student_response": item.student_response,
     }
     task = text_similarity.delay(payload)
+    return {"task_id": task.id}
+
+
+@app.post('/api/coloring-similarity', status_code=201)
+def check_coloring_similarity(request: Request, item: ColoringParams):
+
+    check_token(item.token)
+    payload = {
+        "expected_image": item.expected_image,
+        "student_response": item.student_response,
+        "quark_id": item.quark_id
+    }
+    task = coloring_similarity.delay(payload)
     return {"task_id": task.id}
 
 
