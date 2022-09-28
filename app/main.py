@@ -73,17 +73,19 @@ def check_text_similarity(request: Request, item: SimilarityParams):
     return {"task_id": task.id}
 
 
-@app.post('/api/coloring-similarity', status_code=201)
+@app.post('/api/coloring-similarity', status_code=200)
 def check_coloring_similarity(request: Request, item: ColoringParams):
 
     check_token(item.token)
     payload = {
         "expected_image": item.expected_image,
         "student_response": item.student_response,
-        "quark_id": item.quark_id
+        "quark_id": str(item.quark_id)
     }
-    task = coloring_similarity.delay(payload)
-    return {"task_id": task.id}
+
+    response = coloring_similarity.run(payload)  # Run task sychronous
+
+    return response
 
 
 @app.get("/api/tasks/{task_id}")
