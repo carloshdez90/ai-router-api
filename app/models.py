@@ -35,3 +35,8 @@ class ColoringParams(BaseModel):
     student_response: str
     quark_id: uuid.UUID
     token: str
+
+
+class STTParams(BaseModel):
+    audio_source: str
+    token: str

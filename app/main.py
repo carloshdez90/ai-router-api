@@ -1,8 +1,8 @@
 import os
 from fastapi import FastAPI, Request, HTTPException
 from utils import validate_token
-from worker import celery, classify_image, do_tts, text_similarity, coloring_similarity
-from models import ImageParams, TTSParams, SimilarityParams, ColoringParams
+from worker import celery, classify_image, do_tts, text_similarity, coloring_similarity, do_stt
+from models import ImageParams, TTSParams, SimilarityParams, ColoringParams, STTParams
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -84,6 +84,19 @@ def check_coloring_similarity(request: Request, item: ColoringParams):
     }
 
     response = coloring_similarity.run(payload)  # Run task sychronous
+
+    return response
+
+
+@app.post('/api/speech-to-text', status_code=200)
+def request_stt(request: Request, item: STTParams):
+
+    check_token(item.token)
+    payload = {
+        "audio_source": item.audio_source
+    }
+
+    response = do_stt.run(payload)  # Run task sychronous
 
     return response
 

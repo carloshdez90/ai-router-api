@@ -12,6 +12,7 @@ CLASSIFY_IMAGE_URL = os.getenv('classify_image_url')
 DO_TTS_URL = os.getenv('do_tts_url')
 TEXT_SIMILARITY_URL = os.getenv('text_similarity_url')
 COLORING_SIMILARITY_URL = os.getenv('coloring_similarity_url')
+DO_STT_URL = os.getenv('do_stt_url')
 
 
 celery = Celery(
@@ -49,5 +50,13 @@ def text_similarity(payload):
 def coloring_similarity(payload):
 
     response = requests.post(COLORING_SIMILARITY_URL, json=payload)
+
+    return response.json()
+
+
+@celery.task(name="Do STT")
+def do_stt(payload):
+
+    response = requests.post(DO_STT_URL, json=payload)
 
     return response.json()
